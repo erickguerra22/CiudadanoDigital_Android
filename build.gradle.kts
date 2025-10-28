@@ -7,4 +7,5 @@ plugins {
     id("com.google.dagger.hilt.android") version "2.57.1" apply false
     // Safe Args para navegacion
     id("androidx.navigation.safeargs.kotlin") version "2.9.3" apply false
+    id("com.google.devtools.ksp") version "2.2.10-2.0.2"
 }

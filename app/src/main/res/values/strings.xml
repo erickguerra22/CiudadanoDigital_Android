@@ -1,5 +1,5 @@
 <resources>
-<!--    <string name="app_name">Ciudadano Digital</string>-->
+    <!--    <string name="app_name">Ciudadano Digital</string>-->
     <string name="title_activity_splash">SplashActivity</string>
     <string name="logo">Sapien</string>
     <string name="app_name">Sapien</string>
@@ -24,4 +24,12 @@
     <string name="birthdate">Fecha de nacimiento</string>
     <string name="phone">Número de teléfono</string>
     <string name="phonecode">Código</string>
+    <string name="logo_description">Sapien - Ciudadano Digital</string>
+    <string name="saludo_inicial">¡Hola!\n ¿Qué puedo hacer por ti?</string>
+    <string name="chat_placeholder">Escribe algo...</string>
+    <string name="send_desc">Enviar mensaje</string>
+    <string name="open_chats">Vista de chats</string>
+    <string name="previous_chats_label">Chats Anteriores</string>
+    <string name="new_chat_label">Nuevo Chat</string>
+    <string name="logout_label">Cerrar Sesión</string>
 </resources>

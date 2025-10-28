@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
@@ -13,12 +14,15 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.eguerra.ciudadanodigital.databinding.ActivitySplashBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import kotlin.getValue
 
 @SuppressLint("CustomSplashScreen")
 @AndroidEntryPoint
 class SplashActivity : AppCompatActivity() {
 
+    private val userViewModel: UserViewModel by viewModels()
     private lateinit var binding: ActivitySplashBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -34,42 +38,30 @@ class SplashActivity : AppCompatActivity() {
     }
 
     private fun initEvents() {
-//        userViewModel.getUserData(false)
-        // Simulación de obtención de datos
-        getUserDataSimulated()
-    }
-
-    private fun getUserDataSimulated() {
-        lifecycleScope.launch {
-            delay(3000)
-            val intent = Intent(this@SplashActivity, UnloggedActivity::class.java)
-            startActivity(intent)
-            finish()
-        }
+        userViewModel.getUserData(false)
     }
 
     private fun setObservers() {
-        // TODO()
-//        lifecycleScope.launch {
-//            repeatOnLifecycle(Lifecycle.State.STARTED) {
-//                userViewModel.userDataStateFlow.collectLatest { state ->
-//                    when (state) {
-//                        is UserSessionStatus.Logged -> {
-//                            val intent = Intent(this@SplashActivity, MainActivity::class.java)
-//                            startActivity(intent)
-//                            finish()
-//                        }
-//
-//                        is UserSessionStatus.NotLogged -> {
-//                            val intent = Intent(this@SplashActivity, UnloggedActivity::class.java)
-//                            startActivity(intent)
-//                            finish()
-//                        }
-//
-//                        else -> {}
-//                    }
-//                }
-//            }
-//        }
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                userViewModel.userDataStateFlow.collectLatest { state ->
+                    when (state) {
+                        is UserSessionStatus.Logged -> {
+                            val intent = Intent(this@SplashActivity, MainActivity::class.java)
+                            startActivity(intent)
+                            finish()
+                        }
+
+                        is UserSessionStatus.NotLogged -> {
+                            val intent = Intent(this@SplashActivity, UnloggedActivity::class.java)
+                            startActivity(intent)
+                            finish()
+                        }
+
+                        else -> {}
+                    }
+                }
+            }
+        }
     }
 }

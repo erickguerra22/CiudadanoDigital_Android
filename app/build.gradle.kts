@@ -1,3 +1,13 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import java.util.Properties
+
+val localProps = Properties().apply {
+    val localFile = rootProject.file("local.properties")
+    if (localFile.exists()) load(localFile.inputStream())
+}
+val env: String = localProps.getProperty("ENVIRONMENT", "")
+val apiURL: String = localProps.getProperty("API_URL", "")
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -8,6 +18,7 @@ plugins {
     id("dagger.hilt.android.plugin")
     // SafeArgs para navegacion
     id("androidx.navigation.safeargs.kotlin")
+    id("com.google.devtools.ksp")
 }
 
 android {
@@ -30,6 +41,10 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        // Variables de entorno
+        buildConfigField("String", "ENVIRONMENT", "\"$env\"")
+        buildConfigField("String", "API_URL", "\"$apiURL\"")
     }
 
     buildTypes {
@@ -45,8 +60,11 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
-    kotlinOptions {
-        jvmTarget = "11"
+
+    kotlin {
+        compilerOptions {
+            jvmTarget = JvmTarget.JVM_11
+        }
     }
 
     // Habilitar para HILT
@@ -56,6 +74,7 @@ android {
 
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
@@ -94,4 +113,22 @@ dependencies {
 
     // Splash Activity
     implementation(libs.androidx.core.splashscreen)
+
+    // Retrofit
+    implementation(libs.retrofit)
+    implementation(libs.converter.gson)
+    implementation(libs.logging.interceptor)
+    implementation(libs.gson)
+    implementation(libs.kotlinx.coroutines.android)
+
+    // Room
+    ksp(libs.androidx.room.compiler)
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+
+    // Datastore
+    implementation(libs.androidx.datastore.preferences)
+
+    // ThreeTen
+    implementation(libs.threetenabp)
 }

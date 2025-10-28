@@ -56,8 +56,7 @@
             android:inputType="textEmailAddress"
             android:textColor="@color/white"
             android:textColorHint="@color/placeholder"
-            android:textSize="@dimen/normal_text"
-            tools:text="ejemplo@uvg.edu.gt" />
+            android:textSize="@dimen/normal_text" />
 
     </com.google.android.material.textfield.TextInputLayout>
 

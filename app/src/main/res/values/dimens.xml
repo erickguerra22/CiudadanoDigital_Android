@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="input_radius">10dp</dimen>
+    <dimen name="question_radius">25dp</dimen>
     <dimen name="normal_text">18sp</dimen>
     <dimen name="button_text">20sp</dimen>
     <dimen name="title_text">45sp</dimen>

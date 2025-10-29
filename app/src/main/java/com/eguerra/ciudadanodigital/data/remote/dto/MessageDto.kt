@@ -14,7 +14,7 @@ data class MessageDto(
     val reference: String?,
     val timestamp: String,
     val assigned: Boolean,
-    val responseTime: Long?
+    val responsetime: Long?
 )
 
 fun MessageDto.toMessageModel(): MessageModel {
@@ -29,6 +29,6 @@ fun MessageDto.toMessageModel(): MessageModel {
             DateTimeFormatter.ISO_DATE_TIME
         ).atOffset(ZoneOffset.UTC).toLocalDateTime(),
         assigned = this.assigned,
-        responseTime = this.responseTime
+        responseTime = this.responsetime
     )
 }

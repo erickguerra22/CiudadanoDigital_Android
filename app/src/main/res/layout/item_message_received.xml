@@ -1,30 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_marginVertical="5dp"
-    android:layout_marginEnd="30dp">
+    android:layout_marginEnd="30dp"
+    android:background="@drawable/bg_message_received"
+    android:paddingTop="12dp"
+    android:paddingStart="12dp"
+    android:paddingEnd="12dp"
+    android:paddingBottom="0dp">
 
-    <LinearLayout
-        android:id="@+id/messageReceived_element"
+
+    <TextView
+        android:id="@+id/messageText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="start"
-        android:background="@drawable/bg_message_received"
-        android:orientation="vertical"
-        android:padding="12dp"
+        android:layout_marginTop="0dp"
+        android:fontFamily="@font/urbanist"
+        android:textColor="#000"
+        android:textSize="18sp"
+        android:layout_marginBottom="12dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintBottom_toTopOf="@id/itemMessageReceived_infoButton"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="Este es un mensaje de prueba" />
 
-        <TextView
-            android:id="@+id/messageText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:fontFamily="@font/urbanist"
-            android:textColor="#000"
-            android:textSize="16sp" />
 
-    </LinearLayout>
+    <ImageButton
+        android:id="@+id/itemMessageReceived_infoButton"
+        android:contentDescription="@string/info_icon"
+        android:src="@drawable/info"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginStart="0dp"
+        android:layout_marginBottom="5dp"
+        android:visibility="gone"
+        android:layout_marginTop="-8dp"
+        android:backgroundTint="@android:color/transparent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/messageText" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

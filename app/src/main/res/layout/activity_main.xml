@@ -10,7 +10,6 @@
     android:theme="@style/Theme.CiudadanoDigital"
     tools:context=".ui.activity.MainActivity">
 
-    <!-- FragmentContainerView ocupa toda la pantalla -->
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/mainActivity_fragmentContainer"
         android:name="androidx.navigation.fragment.NavHostFragment"

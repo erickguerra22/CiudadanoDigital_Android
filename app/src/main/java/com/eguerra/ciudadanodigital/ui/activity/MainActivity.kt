@@ -7,6 +7,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.NavController
+import androidx.navigation.fragment.NavHostFragment
 import com.eguerra.ciudadanodigital.databinding.ActivityMainBinding
 import com.eguerra.ciudadanodigital.helpers.InternetStatusListener
 import com.eguerra.ciudadanodigital.helpers.InternetStatusManager
@@ -17,6 +19,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import com.eguerra.ciudadanodigital.R
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity(), InternetStatusListener {
@@ -24,8 +27,8 @@ class MainActivity : AppCompatActivity(), InternetStatusListener {
     @Inject
     lateinit var sessionManager: SessionManager
     private lateinit var binding: ActivityMainBinding
-
     private val mainUserViewModel: UserViewModel by viewModels()
+    private lateinit var navController: NavController
     private var isFirstLoad = true
     private val loadingDialog = LoadingDialog()
     private val loadingViewModel: LoadingViewModel by viewModels()
@@ -45,6 +48,7 @@ class MainActivity : AppCompatActivity(), InternetStatusListener {
             }
         }
 
+        configureNavigation()
         setContentView(binding.root)
         setObservers()
     }
@@ -98,5 +102,11 @@ class MainActivity : AppCompatActivity(), InternetStatusListener {
 
     override fun onInternetStatusChanged(isConnected: Boolean) {
         showToast("Estás conectado: $isConnected", this)
+    }
+
+    private fun configureNavigation() {
+        val navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.mainActivity_fragmentContainer) as NavHostFragment
+        navController = navHostFragment.navController
     }
 }

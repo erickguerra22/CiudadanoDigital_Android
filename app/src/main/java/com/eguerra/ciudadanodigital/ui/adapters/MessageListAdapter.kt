@@ -3,20 +3,23 @@ package com.eguerra.ciudadanodigital.ui.adapters
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.eguerra.ciudadanodigital.R
 import com.eguerra.ciudadanodigital.data.local.entity.MessageModel
 
 class MessageListAdapter(
-    private var dataSet: MutableList<MessageModel>,
-    private val operationListener: MessageListener
+    private var dataSet: MutableList<MessageModel>, private val operationListener: MessageListener
 ) : RecyclerView.Adapter<MessageListAdapter.ViewHolder>() {
 
-    interface MessageListener {}
+    interface MessageListener {
+        fun onReferencesRequested(message: MessageModel)
+    }
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val messageText: TextView = view.findViewById(R.id.messageText)
+        val infoButton: ImageButton? = view.findViewById(R.id.itemMessageReceived_infoButton)
     }
 
     override fun getItemViewType(position: Int): Int {
@@ -34,6 +37,15 @@ class MessageListAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val message = dataSet[position]
         holder.messageText.text = message.content
+
+        if (!message.reference.isNullOrBlank() && holder.infoButton != null) {
+            holder.infoButton.visibility = View.VISIBLE
+            holder.infoButton.setOnClickListener {
+                operationListener.onReferencesRequested(message)
+            }
+        } else {
+            holder.infoButton?.visibility = View.GONE
+        }
     }
 
     override fun getItemCount() = dataSet.size

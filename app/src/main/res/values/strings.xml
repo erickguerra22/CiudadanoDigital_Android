@@ -32,4 +32,14 @@
     <string name="previous_chats_label">Chats Anteriores</string>
     <string name="new_chat_label">Nuevo Chat</string>
     <string name="logout_label">Cerrar Sesión</string>
+    <string name="restore_password_label">Restablecer Contraseña</string>
+    <string name="recovery_advice">Si el correo electrónico está registrado, recibirás un código de recuperación.</string>
+    <string name="send_code_label">Enviar código</string>
+    <string name="verify_code_title">Verificar Recuperación</string>
+    <string name="verify_code_text">Ingresa el código de verificación obtenido.\nSi no recibiste ningún código, regresa a la pantalla anterior e inténtalo de nuevo.</string>
+    <string name="verify_code_label">Verificar Código</string>
+    <string name="set_password_title">Establecer Contraseña</string>
+    <string name="set_password_label">Ingresa tu nueva contraseña para poder acceder nuevamente a la aplicación.</string>
+    <string name="save_label">Guardar</string>
+    <string name="info_icon">ícono de información</string>
 </resources>

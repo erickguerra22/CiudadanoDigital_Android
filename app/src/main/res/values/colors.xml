@@ -12,4 +12,5 @@
     <color name="help_color">#50C6FD</color>
     <color name="placeholder">#CAC4D0</color>
     <color name="input_background">#21304D</color>
+    <color name="clear_input_background">#293F64</color>
 </resources>

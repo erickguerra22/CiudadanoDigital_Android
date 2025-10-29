@@ -75,6 +75,10 @@ class LogInFragment : Fragment() {
                 val action = LogInFragmentDirections.actionLogInFragmentToRegisterFragment()
                 requireView().findNavController().navigate(action)
             }
+            logInFragmentTextRecoverPassword.setOnClickListener {
+                val action = LogInFragmentDirections.actionLogInFragmentToSendRecoveryFragment()
+                requireView().findNavController().navigate(action)
+            }
         }
     }
 

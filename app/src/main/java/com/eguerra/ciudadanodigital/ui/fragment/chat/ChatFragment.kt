@@ -1,5 +1,6 @@
 package com.eguerra.ciudadanodigital.ui.fragment.chat
 
+import android.app.AlertDialog
 import android.graphics.Rect
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -290,8 +291,7 @@ class ChatFragment : Fragment(), MessageListAdapter.MessageListener, ChatListAda
                     "¿Está seguro que desea terminar la sesión actual?",
                     requireContext()
                 ) { confirm ->
-                    if (confirm)
-                        (requireActivity() as MainActivity).handleLogoutAction()
+                    if (confirm) (requireActivity() as MainActivity).handleLogoutAction()
                 }
             }
 
@@ -330,10 +330,7 @@ class ChatFragment : Fragment(), MessageListAdapter.MessageListener, ChatListAda
         overlay.animate().alpha(1f).setDuration(200).start()
 
         panel.isVisible = true
-        panel.animate()
-            .translationX(0f)
-            .setDuration(250)
-            .start()
+        panel.animate().translationX(0f).setDuration(250).start()
 
         isPanelVisible = true
     }
@@ -342,14 +339,11 @@ class ChatFragment : Fragment(), MessageListAdapter.MessageListener, ChatListAda
         val panel = binding.chatFragmentSidePanelContainer
         val overlay = binding.chatFragmentOverlayView
 
-        overlay.animate().alpha(0f).setDuration(200)
-            .withEndAction { overlay.isVisible = false }.start()
-
-        panel.animate()
-            .translationX(-panel.width.toFloat())
-            .setDuration(250)
-            .withEndAction { panel.isVisible = false }
+        overlay.animate().alpha(0f).setDuration(200).withEndAction { overlay.isVisible = false }
             .start()
+
+        panel.animate().translationX(-panel.width.toFloat()).setDuration(250)
+            .withEndAction { panel.isVisible = false }.start()
 
         isPanelVisible = false
     }
@@ -367,5 +361,14 @@ class ChatFragment : Fragment(), MessageListAdapter.MessageListener, ChatListAda
         chatId = chat.chatId.toString()
         hideSidePanel()
         messageViewModel.getMessages(chatId!!, 20, null, false)
+    }
+
+    override fun onReferencesRequested(message: MessageModel) {
+        val referencesText = message.reference
+        val tiempoRespuesta =
+            if (message.responseTime != null) "\n\n• Tiempo: ${message.responseTime / 1000}s" else ""
+
+        AlertDialog.Builder(requireContext()).setTitle("Detalles de la respuesta")
+            .setMessage("Referencias: $referencesText$tiempoRespuesta").setPositiveButton("Cerrar", null).show()
     }
 }

@@ -31,7 +31,7 @@ class RecoveryViewModel @Inject constructor(
 
                 else -> {
                     _sendRecoveryStateFlow.value =
-                        Status.Error(result.message ?: "Ocurrió un error.")
+                        Status.Error(result.code ?: 500, result.message ?: "Ocurrió un error.")
                 }
             }
         }
@@ -52,7 +52,7 @@ class RecoveryViewModel @Inject constructor(
 
                 else -> {
                     _verifyCodeStateFlow.value =
-                        Status.Error(result.message ?: "Ocurrió un error.")
+                        Status.Error(result.code ?: 500, result.message ?: "Ocurrió un error.")
                 }
             }
         }
@@ -73,7 +73,7 @@ class RecoveryViewModel @Inject constructor(
 
                 else -> {
                     _resetPasswordStateFlow.value =
-                        Status.Error(result.message ?: "Ocurrió un error.")
+                        Status.Error(result.code ?: 500,result.message ?: "Ocurrió un error.")
                 }
             }
         }

@@ -34,7 +34,7 @@ class MessageViewModel @Inject constructor(
 
                 else -> {
                     _createMessageStateFlow.value =
-                        Status.Error(result.message ?: "Ocurrió un error al enviar el mensaje.")
+                        Status.Error(result.code ?: 500,result.message ?: "Ocurrió un error al enviar el mensaje.")
                 }
             }
         }
@@ -58,7 +58,7 @@ class MessageViewModel @Inject constructor(
 
                 else -> {
                     _getResponseStateFlow.value =
-                        Status.Error(result.message ?: "Ocurrió un error al obtener la respuesta.")
+                        Status.Error(result.code ?: 500,result.message ?: "Ocurrió un error al obtener la respuesta.")
                 }
             }
         }
@@ -83,7 +83,7 @@ class MessageViewModel @Inject constructor(
 
                 else -> {
                     _getChatMessagesStateFlow.value =
-                        Status.Error(result.message ?: "Ocurrió un error al obtener los mensajes.")
+                        Status.Error(result.code ?: 500, result.message ?: "Ocurrió un error al obtener los mensajes.")
                 }
             }
         }
@@ -107,7 +107,7 @@ class MessageViewModel @Inject constructor(
 
                 else -> {
                     _assignMessageStateFlow.value =
-                        Status.Error(result.message ?: "Ocurrió un error al asignar el mensaje.")
+                        Status.Error(result.code ?: 500,result.message ?: "Ocurrió un error al asignar el mensaje.")
                 }
             }
         }

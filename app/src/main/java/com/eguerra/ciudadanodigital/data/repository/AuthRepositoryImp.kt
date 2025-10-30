@@ -50,7 +50,7 @@ class AuthRepositoryImp @Inject constructor(
             val errorBody = resultUser.errorBody()
             val error = errorParser.parseErrorObject(errorBody)
 
-            Resource.Error(error?.let {
+            Resource.Error(resultUser.code(), error?.let {
                 it.error ?: "Error al obtener los datos del usuario."
             } ?: "Error al obtener los datos del usuario.")
         }
@@ -66,7 +66,7 @@ class AuthRepositoryImp @Inject constructor(
 
                 val response: AuthResponse? = result.body()
                 if (response == null) {
-                    return Resource.Error("Respuesta vacía del servidor.")
+                    return Resource.Error(result.code(), "Respuesta vacía del servidor.")
                 }
 
                 val ds = MyDataStore(context)
@@ -88,7 +88,7 @@ class AuthRepositoryImp @Inject constructor(
                 }
             } else {
                 val error = errorParser.parseErrorObject(result.errorBody())
-                Resource.Error(
+                Resource.Error(result.code(),
                     error?.error ?: "Usuario o contraseña incorrectos."
                 )
             }
@@ -101,10 +101,10 @@ class AuthRepositoryImp @Inject constructor(
     override suspend fun refreshToken(): Resource<String> {
         try {
             val ds = MyDataStore(context)
-            val expire = ds.getValueFromKey("expire") ?: return Resource.Error("No expire")
-            val token: String = ds.getValueFromKey("token") ?: return Resource.Error("No token")
+            val expire = ds.getValueFromKey("expire") ?: return Resource.Error(404,"No expire")
+            val token: String = ds.getValueFromKey("token") ?: return Resource.Error(404,"No token")
             val refreshToken =
-                ds.getValueFromKey("refreshToken") ?: return Resource.Error("No refreshToken")
+                ds.getValueFromKey("refreshToken") ?: return Resource.Error(404,"No refreshToken")
 
             val expireDateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
             val expireDate: Date = expireDateFormat.parse(expire) ?: Date()
@@ -118,12 +118,12 @@ class AuthRepositoryImp @Inject constructor(
                 return if (token.isNotBlank()) {
                     Resource.Success(token)
                 } else {
-                    Resource.Error("No hay conexión a internet y no se encontró token válido almacenado")
+                    Resource.Error(500,"No hay conexión a internet y no se encontró token válido almacenado")
                 }
             }
 
             if (currentTime >= expireDate) {
-                if (refreshToken.isBlank()) return Resource.Error("No refreshToken")
+                if (refreshToken.isBlank()) return Resource.Error(404,"No refreshToken")
 
                 val result = api.refreshToken(token = "Bearer $token", RefreshRequest(refreshToken))
 
@@ -131,7 +131,7 @@ class AuthRepositoryImp @Inject constructor(
                     val response: AuthResponse? = result.body()
 
                     if (response == null) {
-                        return Resource.Error("Respuesta vacía del servidor.")
+                        return Resource.Error(404,"Respuesta vacía del servidor.")
                     }
 
                     val (newToken, expiresIn, newRefresh) = response
@@ -151,11 +151,11 @@ class AuthRepositoryImp @Inject constructor(
                 } else {
                     val error = errorParser.parseErrorObject(result.errorBody())
                     sessionManager.triggerLogout(error?.error ?: "La sesión ha caducado.")
-                    return Resource.Error("Sesión inválida")
+                    return Resource.Error(403,"Sesión inválida")
                 }
             }
             ds.saveKeyValue("offline", "false")
-            return if (token.isNotBlank()) Resource.Success(token) else Resource.Error("No token")
+            return if (token.isNotBlank()) Resource.Success(token) else Resource.Error(404,"No token")
         } catch (ex: Exception) {
             return handleException("refreshToken", repositoryName, ex)
         }
@@ -168,14 +168,14 @@ class AuthRepositoryImp @Inject constructor(
             return if (result.isSuccessful) {
                 val response: SimpleMessageResponse? = result.body()
                 if (response == null) {
-                    return Resource.Error("Respuesta vacía del servidor.")
+                    return Resource.Error(404,"Respuesta vacía del servidor.")
                 }
 
                 val (message) = response
                 Resource.Success(message)
             } else {
                 val error = errorParser.parseErrorObject(result.errorBody())
-                Resource.Error(
+                Resource.Error(result.code(),
                     error?.error ?: "No se pudo enviar el código de recuperación."
                 )
             }
@@ -198,7 +198,7 @@ class AuthRepositoryImp @Inject constructor(
             return if (result.isSuccessful) {
                 val response: VerifyRecoveryResponse? = result.body()
                 if (response == null) {
-                    return Resource.Error("Respuesta vacía del servidor.")
+                    return Resource.Error(404,"Respuesta vacía del servidor.")
                 }
 
                 val ds = MyDataStore(context)
@@ -215,7 +215,7 @@ class AuthRepositoryImp @Inject constructor(
                 Resource.Success(Pair(true, message))
             } else {
                 val error = errorParser.parseErrorObject(result.errorBody())
-                Resource.Error(
+                Resource.Error(result.code(),
                     error?.error ?: "No se pudo verificar el código de recuperación."
                 )
             }
@@ -228,29 +228,29 @@ class AuthRepositoryImp @Inject constructor(
         try {
             val ds = MyDataStore(context)
             val recoveryToken: String =
-                ds.getValueFromKey("recoveryToken") ?: return Resource.Error("No token")
+                ds.getValueFromKey("recoveryToken") ?: return Resource.Error(404,"No token")
             val recoveryExpire =
-                ds.getValueFromKey("recoveryExpire") ?: return Resource.Error("No expire")
+                ds.getValueFromKey("recoveryExpire") ?: return Resource.Error(404,"No expire")
 
             val expireDateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
             val expireDate: Date = expireDateFormat.parse(recoveryExpire) ?: Date()
             val currentTime = Calendar.getInstance().time
 
-            if (currentTime >= expireDate) return Resource.Error("El token indicado ha expirado")
+            if (currentTime >= expireDate) return Resource.Error(403,"El token indicado ha expirado")
 
             val result = api.recoverPassword("Bearer $recoveryToken", PasswordRequest(newPassword))
 
             return if (result.isSuccessful) {
                 val response: SimpleMessageResponse? = result.body()
                 if (response == null) {
-                    return Resource.Error("Respuesta vacía del servidor.")
+                    return Resource.Error(404,"Respuesta vacía del servidor.")
                 }
 
                 val (message) = response
                 Resource.Success(Pair(true, message))
             } else {
                 val error = errorParser.parseErrorObject(result.errorBody())
-                Resource.Error(
+                Resource.Error(result.code(),
                     error?.error ?: "No se pudo actualizar la contraseña."
                 )
             }
@@ -262,10 +262,10 @@ class AuthRepositoryImp @Inject constructor(
     override suspend fun logout(): Resource<Pair<Boolean, String>> {
         try {
             val ds = MyDataStore(context)
-            val token: String = ds.getValueFromKey("token") ?: return Resource.Error("No token")
+            val token: String = ds.getValueFromKey("token") ?: return Resource.Error(404,"No token")
             val internetConnection = InternetStatusManager.getLastConnectionState()
             val refreshToken =
-                ds.getValueFromKey("refreshToken") ?: return Resource.Error("No refreshToken")
+                ds.getValueFromKey("refreshToken") ?: return Resource.Error(404,"No refreshToken")
 
             ds.clearData()
             database.userDao().deleteAll()
@@ -277,7 +277,7 @@ class AuthRepositoryImp @Inject constructor(
                 return Resource.Success(Pair(true, "Sesión cerrada"))
             }
 
-            if (refreshToken.isBlank()) return Resource.Error("No refreshToken")
+            if (refreshToken.isBlank()) return Resource.Error(404,"No refreshToken")
 
             val result = api.logout(token = "Bearer $token", RefreshRequest(refreshToken))
 
@@ -285,7 +285,7 @@ class AuthRepositoryImp @Inject constructor(
                 val response: SimpleMessageResponse? = result.body()
 
                 if (response == null) {
-                    return Resource.Error("Respuesta vacía del servidor.")
+                    return Resource.Error(404,"Respuesta vacía del servidor.")
                 }
 
                 val (message) = response
@@ -294,7 +294,7 @@ class AuthRepositoryImp @Inject constructor(
             } else {
                 val error = errorParser.parseErrorObject(result.errorBody())
                 sessionManager.triggerLogout(error?.error ?: "La sesión ha caducado.")
-                return Resource.Error("Sesión inválida")
+                return Resource.Error(403,"Sesión inválida")
             }
         } catch (ex: Exception) {
             return handleException("logout", repositoryName, ex)

@@ -11,5 +11,5 @@ fun <T> handleException(funName: String, repository: String, ex: Exception): Res
         ex.message?.contains("timeout") == true -> "Tiempo de espera agotado"
         else -> "500: Error de servidor."
     }
-    return Resource.Error(message)
+    return Resource.Error(500,message)
 }

@@ -1,45 +1,42 @@
 package com.eguerra.ciudadanodigital.ui.fragment.chat
 
 import android.app.AlertDialog
-import android.graphics.Rect
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.eguerra.ciudadanodigital.data.local.entity.ChatModel
 import com.eguerra.ciudadanodigital.data.local.entity.MessageModel
 import com.eguerra.ciudadanodigital.databinding.FragmentChatBinding
 import com.eguerra.ciudadanodigital.ui.Status
+import com.eguerra.ciudadanodigital.ui.activity.ChatViewModel
 import com.eguerra.ciudadanodigital.ui.activity.LoadingViewModel
 import com.eguerra.ciudadanodigital.ui.activity.MainActivity
-import com.eguerra.ciudadanodigital.ui.adapters.ChatListAdapter
+import com.eguerra.ciudadanodigital.ui.activity.UserViewModel
 import com.eguerra.ciudadanodigital.ui.adapters.MessageListAdapter
-import com.eguerra.ciudadanodigital.ui.util.showConfirmationDialog
 import com.eguerra.ciudadanodigital.ui.util.showToast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class ChatFragment : Fragment(), MessageListAdapter.MessageListener, ChatListAdapter.ChatListener {
+class ChatFragment : Fragment(), MessageListAdapter.MessageListener {
     private lateinit var binding: FragmentChatBinding
     private val messageViewModel: MessageViewModel by viewModels()
-    private val chatViewModel: ChatViewModel by viewModels()
+    private val mainChatViewModel: ChatViewModel by activityViewModels()
     private val loadingViewModel: LoadingViewModel by activityViewModels()
-    private var chatId: String? = null
     private var isMessagesRecyclerUp: Boolean = false
-    private var isChatsRecyclerUp: Boolean = false
     private var messageAdapter: MessageListAdapter? = null
-    private var chatAdapter: ChatListAdapter? = null
     private var unassignedMessages: MutableList<MessageModel> = mutableListOf()
-    private var isPanelVisible = false
+    private val userViewModel: UserViewModel by viewModels()
+    private var localChatId: String? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -52,8 +49,6 @@ class ChatFragment : Fragment(), MessageListAdapter.MessageListener, ChatListAda
         super.onViewCreated(view, savedInstanceState)
 
         setupMessagesRecycler()
-        setupChatsRecycler()
-        initEvents()
         setListeners()
         setObservers()
     }
@@ -61,26 +56,31 @@ class ChatFragment : Fragment(), MessageListAdapter.MessageListener, ChatListAda
     private fun setupMessagesRecycler() {
         messageAdapter = MessageListAdapter(mutableListOf(), this)
         binding.chatFragmentMessagesRecycler.apply {
-            layoutManager = LinearLayoutManager(requireContext())
+            layoutManager = LinearLayoutManager(requireContext()).apply {
+                stackFromEnd = true
+                reverseLayout = false
+            }
             adapter = messageAdapter
         }
     }
 
-    private fun setupChatsRecycler() {
-        chatAdapter = ChatListAdapter(mutableListOf(), this)
-        binding.chatFragmentChatsRecycler.apply {
-            layoutManager = LinearLayoutManager(requireContext())
-            adapter = chatAdapter
-        }
-    }
-
-    private fun initEvents() {
-        if (chatId != null) {
-            messageViewModel.getMessages(chatId!!, 20, null, false)
-        }
-    }
-
     private fun setObservers() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                mainChatViewModel.selectedChatId.collectLatest { chatId ->
+                    if (chatId != null) {
+                        if (localChatId == null || localChatId != chatId) {
+                            localChatId = chatId
+                            messageViewModel.getMessages(chatId, 50, null)
+                        }
+                        mainChatViewModel.getMessages(chatId, 20, null, false)
+                    } else {
+                        localChatId = chatId
+                        hideMessagesRecycler()
+                    }
+                }
+            }
+        }
         viewLifecycleOwner.lifecycleScope.launch {
             messageViewModel.createMessageStateFlow.collectLatest { result ->
                 when (result) {
@@ -94,7 +94,6 @@ class ChatFragment : Fragment(), MessageListAdapter.MessageListener, ChatListAda
                         val message = result.value
 
                         showMessagesRecycler()
-                        println("ADDTOUNASSIGNED: ${message.chatId == null}")
 
                         if (message.chatId == null) unassignedMessages.add(message)
 
@@ -107,7 +106,9 @@ class ChatFragment : Fragment(), MessageListAdapter.MessageListener, ChatListAda
                                 )
                             }
                         }
-                        messageViewModel.getResponse(question = message.content, chatId)
+                        messageViewModel.getResponse(
+                            question = message.content, localChatId
+                        )
                     }
 
                     is Status.Error -> {
@@ -133,11 +134,9 @@ class ChatFragment : Fragment(), MessageListAdapter.MessageListener, ChatListAda
                         binding.chatFragmentMessageTextInput.isEnabled = true
                         val (message, newChat) = result.value
 
-                        chatId = message.chatId?.toString()
-                        println("NEWCHAT: $newChat")
+                        mainChatViewModel.selectChat(message.chatId?.toString())
                         if (newChat) {
                             for (m in unassignedMessages) {
-                                println("MESSAGETOASSIGN: $m")
                                 messageViewModel.assignMessage(
                                     messageId = m.messageId.toString(),
                                     chatId = message.chatId.toString()
@@ -199,8 +198,12 @@ class ChatFragment : Fragment(), MessageListAdapter.MessageListener, ChatListAda
                             showMessagesRecycler()
                             messageAdapter?.setMessages(messages)
 
-                            binding.chatFragmentMessagesRecycler.post {
-                                binding.chatFragmentMessagesRecycler.scrollToPosition(messages.size - 1)
+                            val recycler = binding.chatFragmentMessagesRecycler
+                            val layoutManager = recycler.layoutManager as LinearLayoutManager
+                            layoutManager.stackFromEnd = true
+
+                            if (!recycler.canScrollVertically(-1)) {
+                                layoutManager.scrollToPositionWithOffset(messages.size - 1, Int.MIN_VALUE)
                             }
                         } else {
                             hideMessagesRecycler()
@@ -210,31 +213,7 @@ class ChatFragment : Fragment(), MessageListAdapter.MessageListener, ChatListAda
                     is Status.Error -> {
                         binding.chatFragmentMessageTextInput.isEnabled = true
                         hideMessagesRecycler()
-                        showToast(result.error, requireContext())
-                    }
-
-                    else -> {}
-                }
-            }
-        }
-
-        viewLifecycleOwner.lifecycleScope.launch {
-            chatViewModel.getUserChatsStateFlow.collectLatest { result ->
-                when (result) {
-                    is Status.Loading -> {}
-
-                    is Status.Success -> {
-                        val chats = result.value
-
-                        if (chats.isNotEmpty()) {
-                            showChatsRecycler()
-                            chatAdapter?.setChats(chats)
-                        }
-                    }
-
-                    is Status.Error -> {
-                        chatAdapter?.setChats(emptyList())
-                        showToast(result.error, requireContext())
+                        if (result.code != 404) showToast(result.error, requireContext())
                     }
 
                     else -> {}
@@ -259,13 +238,6 @@ class ChatFragment : Fragment(), MessageListAdapter.MessageListener, ChatListAda
         }
     }
 
-    private fun showChatsRecycler() {
-        if (!isChatsRecyclerUp) {
-            isChatsRecyclerUp = true
-            binding.chatFragmentChatsRecycler.isVisible = true
-        }
-    }
-
     private fun setListeners() {
         binding.apply {
             chatFragmentMessageTextInput.setEndIconOnClickListener {
@@ -275,92 +247,20 @@ class ChatFragment : Fragment(), MessageListAdapter.MessageListener, ChatListAda
             }
 
             chatFragmentPanelImageButton.setOnClickListener {
-                toggleSidePanel()
-                chatViewModel.getChats()
-            }
-
-            chatFragmentNewChatButton.setOnClickListener {
-                hideMessagesRecycler()
-                chatId = null
-                hideSidePanel()
-            }
-
-            chatFragmentLogoutButton.setOnClickListener {
-                showConfirmationDialog(
-                    "Cerrar Sesión",
-                    "¿Está seguro que desea terminar la sesión actual?",
-                    requireContext()
-                ) { confirm ->
-                    if (confirm) (requireActivity() as MainActivity).handleLogoutAction()
-                }
-            }
-
-            chatFragmentOverlayView.apply {
-                setOnTouchListener { v, event ->
-                    val panelRect = Rect()
-                    binding.chatFragmentSidePanelContainer.getGlobalVisibleRect(panelRect)
-
-                    if (panelRect.contains(event.rawX.toInt(), event.rawY.toInt())) {
-                        return@setOnTouchListener false
-                    }
-
-                    if (event.action == MotionEvent.ACTION_UP) {
-                        v.performClick()
-                        hideSidePanel()
-                    }
-
-                    true
-                }
-
-                setOnClickListener {}
+                (requireActivity() as MainActivity).toggleSidePanel()
             }
         }
     }
 
-    private fun toggleSidePanel() {
-        if (isPanelVisible) hideSidePanel() else showSidePanel()
-    }
-
-    private fun showSidePanel() {
-        val panel = binding.chatFragmentSidePanelContainer
-        val overlay = binding.chatFragmentOverlayView
-
-        overlay.isVisible = true
-        overlay.alpha = 0f
-        overlay.animate().alpha(1f).setDuration(200).start()
-
-        panel.isVisible = true
-        panel.animate().translationX(0f).setDuration(250).start()
-
-        isPanelVisible = true
-    }
-
-    private fun hideSidePanel() {
-        val panel = binding.chatFragmentSidePanelContainer
-        val overlay = binding.chatFragmentOverlayView
-
-        overlay.animate().alpha(0f).setDuration(200).withEndAction { overlay.isVisible = false }
-            .start()
-
-        panel.animate().translationX(-panel.width.toFloat()).setDuration(250)
-            .withEndAction { panel.isVisible = false }.start()
-
-        isPanelVisible = false
-    }
-
     private fun sendMessage(content: String) {
-        messageViewModel.newMessage(content = content, chatId = chatId)
+        messageViewModel.newMessage(
+            content = content, chatId = localChatId
+        )
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         messageAdapter = null
-    }
-
-    override fun onItemClicked(chat: ChatModel) {
-        chatId = chat.chatId.toString()
-        hideSidePanel()
-        messageViewModel.getMessages(chatId!!, 20, null, false)
     }
 
     override fun onReferencesRequested(message: MessageModel) {
@@ -369,6 +269,7 @@ class ChatFragment : Fragment(), MessageListAdapter.MessageListener, ChatListAda
             if (message.responseTime != null) "\n\n• Tiempo: ${message.responseTime / 1000}s" else ""
 
         AlertDialog.Builder(requireContext()).setTitle("Detalles de la respuesta")
-            .setMessage("Referencias: $referencesText$tiempoRespuesta").setPositiveButton("Cerrar", null).show()
+            .setMessage("Referencias: $referencesText$tiempoRespuesta")
+            .setPositiveButton("Cerrar", null).show()
     }
 }

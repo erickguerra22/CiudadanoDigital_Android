@@ -29,14 +29,14 @@ class MessageRepositoryImp @Inject constructor(
         try {
             when (val activeSession = authRepository.refreshToken()) {
                 is Resource.Error -> {
-                    return Resource.Error(activeSession.message ?: "Error al validar sesión")
+                    return Resource.Error(403,activeSession.message ?: "Error al validar sesión")
                 }
 
                 is Resource.Success -> {
                     val token = activeSession.data
                     val formattedChatId = chatId.toLongOrNull()
 
-                    if (formattedChatId == null) return Resource.Error("El chatId no es válido")
+                    if (formattedChatId == null) return Resource.Error(400,"El chatId no es válido")
 
                     val result = api.getChatMessages(
                         "Bearer $token", formattedChatId, limit, offset
@@ -45,14 +45,14 @@ class MessageRepositoryImp @Inject constructor(
                     return if (result.isSuccessful) {
                         val response: GetChatMessagesResponse? = result.body()
                         if (response == null) {
-                            return Resource.Error("Respuesta vacía del servidor.")
+                            return Resource.Error(404,"Respuesta vacía del servidor.")
                         }
 
                         val (messages) = response
                         Resource.Success(messages.map { message -> message.toMessageModel() })
                     } else {
                         val error = errorParser.parseErrorObject(result.errorBody())
-                        Resource.Error(
+                        Resource.Error(result.code(),
                             error?.error ?: "No se pudo obtener los mensajes del chat."
                         )
                     }
@@ -70,7 +70,7 @@ class MessageRepositoryImp @Inject constructor(
         try {
             when (val activeSession = authRepository.refreshToken()) {
                 is Resource.Error -> {
-                    return Resource.Error(activeSession.message ?: "Error al validar sesión")
+                    return Resource.Error(403,activeSession.message ?: "Error al validar sesión")
                 }
 
                 is Resource.Success -> {
@@ -91,14 +91,14 @@ class MessageRepositoryImp @Inject constructor(
                     return if (result.isSuccessful) {
                         val response: NewMessageResponse? = result.body()
                         if (response == null) {
-                            return Resource.Error("Respuesta vacía del servidor.")
+                            return Resource.Error(404,"Respuesta vacía del servidor.")
                         }
 
                         val (message, chatMessage) = response
                         Resource.Success(Pair(chatMessage.toMessageModel(), message))
                     } else {
                         val error = errorParser.parseErrorObject(result.errorBody())
-                        Resource.Error(
+                        Resource.Error(result.code(),
                             error?.error ?: "No se pudo enviar el mensaje."
                         )
                     }
@@ -117,7 +117,7 @@ class MessageRepositoryImp @Inject constructor(
         try {
             when (val activeSession = authRepository.refreshToken()) {
                 is Resource.Error -> {
-                    return Resource.Error(activeSession.message ?: "Error al validar sesión")
+                    return Resource.Error(403,activeSession.message ?: "Error al validar sesión")
                 }
 
                 is Resource.Success -> {
@@ -125,8 +125,8 @@ class MessageRepositoryImp @Inject constructor(
                     val formattedChatId = chatId.toLongOrNull()
                     val formattedMessageId = messageId.toLongOrNull()
 
-                    if (formattedChatId == null) return Resource.Error("El chatId no es válido")
-                    if (formattedMessageId == null) return Resource.Error("El messageId no es válido")
+                    if (formattedChatId == null) return Resource.Error(400,"El chatId no es válido")
+                    if (formattedMessageId == null) return Resource.Error(400,"El messageId no es válido")
 
                     val result = api.assignMessage(
                         "Bearer $token",
@@ -137,13 +137,13 @@ class MessageRepositoryImp @Inject constructor(
                     return if (result.isSuccessful) {
                         val message: MessageModel? = result.body()?.toMessageModel()
                         if (message == null) {
-                            return Resource.Error("Respuesta vacía del servidor.")
+                            return Resource.Error(404,"Respuesta vacía del servidor.")
                         }
 
                         Resource.Success(true)
                     } else {
                         val error = errorParser.parseErrorObject(result.errorBody())
-                        Resource.Error(
+                        Resource.Error(result.code(),
                             error?.error ?: "No se pudo obtener los mensajes del chat."
                         )
                     }
@@ -161,7 +161,7 @@ class MessageRepositoryImp @Inject constructor(
         try {
             when (val activeSession = authRepository.refreshToken()) {
                 is Resource.Error -> {
-                    return Resource.Error(activeSession.message ?: "Error al validar sesión")
+                    return Resource.Error(403,activeSession.message ?: "Error al validar sesión")
                 }
 
                 is Resource.Success -> {
@@ -180,14 +180,14 @@ class MessageRepositoryImp @Inject constructor(
                     return if (result.isSuccessful) {
                         val response: NewResponse? = result.body()
                         if (response == null) {
-                            return Resource.Error("Respuesta vacía del servidor.")
+                            return Resource.Error(404,"Respuesta vacía del servidor.")
                         }
 
                         val (message, newChat, chatMessage) = response
                         Resource.Success(Triple(chatMessage.toMessageModel(), message, newChat))
                     } else {
                         val error = errorParser.parseErrorObject(result.errorBody())
-                        Resource.Error(
+                        Resource.Error(result.code(),
                             error?.error ?: "No se pudo obtener los mensajes del chat."
                         )
                     }

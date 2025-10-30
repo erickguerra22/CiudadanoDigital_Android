@@ -59,6 +59,7 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/chatFragment_messagesRecycler"
             android:layout_width="0dp"
+            app:stackFromEnd="true"
             android:layout_height="0dp"
             android:layout_marginTop="10dp"
             android:layout_marginBottom="16dp"
@@ -108,104 +109,5 @@
                 android:textColorHint="@color/placeholder"
                 android:textSize="24sp" />
         </com.google.android.material.textfield.TextInputLayout>
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <View
-        android:id="@+id/chatFragment_overlayView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="#CB646464"
-        android:visibility="gone" />
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/chatFragment_sidePanelContainer"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_gravity="start"
-        android:layout_marginEnd="100dp"
-        android:background="@color/main_color"
-        android:elevation="8dp"
-        android:orientation="vertical"
-        android:padding="16dp"
-        android:translationX="-250dp"
-        android:visibility="gone">
-
-        <TextView
-            android:id="@+id/chatFragment_previousChatsLabel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="50dp"
-            android:fontFamily="@font/urbanist"
-            android:text="@string/previous_chats_label"
-            android:textColor="#BABABA"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toTopOf="@id/chatFragment_chatsRecycler"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/chatFragment_chatsRecycler"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="16dp"
-            android:clipToPadding="false"
-            android:paddingTop="8dp"
-            android:paddingBottom="8dp"
-            android:visibility="visible"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/chatFragment_previousChatsLabel" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/chatFragment_newChatButton"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="30dp"
-            android:layout_marginBottom="5dp"
-            android:backgroundTint="#21304D"
-            android:elevation="8dp"
-            android:fontFamily="@font/urbanist"
-            android:paddingHorizontal="20dp"
-            android:paddingVertical="10dp"
-            android:text="@string/new_chat_label"
-            android:textAllCaps="false"
-            android:textColor="@color/white"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            app:cornerRadius="@dimen/input_radius"
-            app:icon="@drawable/new_chat"
-            app:iconSize="20dp"
-            app:iconTint="#979797"
-            app:layout_constraintBottom_toTopOf="@id/chatFragment_logoutButton"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/chatFragment_logoutButton"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="30dp"
-            android:layout_marginBottom="25dp"
-            android:elevation="0dp"
-            android:fontFamily="@font/urbanist"
-            android:paddingHorizontal="20dp"
-            android:stateListAnimator="@null"
-            android:text="@string/logout_label"
-            android:textAllCaps="false"
-            android:textColor="@color/red"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            app:backgroundTint="@android:color/transparent"
-            app:cornerRadius="@dimen/input_radius"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:rippleColor="@android:color/transparent"
-            app:strokeColor="@android:color/transparent"
-            app:strokeWidth="0dp" />
-
     </androidx.constraintlayout.widget.ConstraintLayout>
 </FrameLayout>

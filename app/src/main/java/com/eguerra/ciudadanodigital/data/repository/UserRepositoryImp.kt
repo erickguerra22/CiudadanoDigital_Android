@@ -31,7 +31,7 @@ class UserRepositoryImp @Inject constructor(
             when (val activeSession = authRepository.refreshToken()) {
                 is Resource.Error -> {
                     println("ERROR: ${activeSession.message}")
-                    return Resource.Error(activeSession.message ?: "Error al validar sesión")
+                    return Resource.Error(403,activeSession.message ?: "Error al validar sesión")
                 }
 
                 is Resource.Success -> {
@@ -44,13 +44,13 @@ class UserRepositoryImp @Inject constructor(
                         val user: UserModel? = result.body()?.toUserModel()
                         println("USER: $user")
                         if (user == null) {
-                            return Resource.Error("Respuesta vacía del servidor.")
+                            return Resource.Error(404,"Respuesta vacía del servidor.")
                         }
 
                         Resource.Success(user)
                     } else {
                         val error = errorParser.parseErrorObject(result.errorBody())
-                        Resource.Error(
+                        Resource.Error(result.code(),
                             error?.error ?: "No se pudo obtener los datos del usuario."
                         )
                     }
@@ -88,13 +88,13 @@ class UserRepositoryImp @Inject constructor(
             return if (result.isSuccessful) {
                 val result: AuthResponse? = result.body()
                 if (result == null) {
-                    return Resource.Error("Respuesta vacía del servidor.")
+                    return Resource.Error(404,"Respuesta vacía del servidor.")
                 }
 
                 return authRepository.login(email, password)
             } else {
                 val error = errorParser.parseErrorObject(result.errorBody())
-                Resource.Error(
+                Resource.Error(result.code(),
                     error?.error ?: "No se pudo registrar al usuario."
                 )
             }
@@ -114,18 +114,18 @@ class UserRepositoryImp @Inject constructor(
         try {
             when (val activeSession = authRepository.refreshToken()) {
                 is Resource.Error -> {
-                    return Resource.Error(activeSession.message ?: "Error al validar sesión")
+                    return Resource.Error(403,activeSession.message ?: "Error al validar sesión")
                 }
 
                 is Resource.Success -> {
                     val token = activeSession.data
                     val ds = MyDataStore(context)
                     val storedUserId =
-                        ds.getValueFromKey("userId") ?: return Resource.Error("No userId")
+                        ds.getValueFromKey("userId") ?: return Resource.Error(404,"No userId")
 
                     val userId = storedUserId.toLongOrNull()
 
-                    if (userId == null) return Resource.Error("El userId no es válido")
+                    if (userId == null) return Resource.Error(400,"El userId no es válido")
 
                     val result = api.updateUser(
                         "Bearer $token", userId, UpdateUserRequest(
@@ -141,13 +141,13 @@ class UserRepositoryImp @Inject constructor(
                     return if (result.isSuccessful) {
                         val user: UserModel? = result.body()?.toUserModel()
                         if (user == null) {
-                            return Resource.Error("Respuesta vacía del servidor.")
+                            return Resource.Error(404,"Respuesta vacía del servidor.")
                         }
 
                         Resource.Success(user)
                     } else {
                         val error = errorParser.parseErrorObject(result.errorBody())
-                        Resource.Error(
+                        Resource.Error(result.code(),
                             error?.error ?: "No se pudo actualizar el usuario."
                         )
                     }

@@ -6,11 +6,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
+import com.eguerra.ciudadanodigital.data.local.countries
 import com.eguerra.ciudadanodigital.databinding.FragmentRegisterBinding
 import com.eguerra.ciudadanodigital.helpers.DATE_FORMAT
 import com.eguerra.ciudadanodigital.ui.activity.MainActivity
@@ -36,9 +38,34 @@ class RegisterFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        initDateField()
+        initEvents()
         setListeners()
         setObservers()
+    }
+
+    private fun initEvents() {
+        initDateField()
+        setDropLists()
+    }
+
+    private fun setDropLists() {
+        val phoneCodes = countries.sortedBy { country -> country.phoneCode }.map { country ->
+            "+${country.phoneCode} ${country.flag}"
+        }
+
+        val adapterPhoneCodes = ArrayAdapter(
+            requireContext(),
+            androidx.appcompat.R.layout.support_simple_spinner_dropdown_item,
+            phoneCodes
+        )
+        binding.registerFragmentPhonecodeEditText.setAdapter(adapterPhoneCodes)
+
+        val defaultCountry = countries.find { it.abbreviation.equals("GT", ignoreCase = true) }
+        if (defaultCountry != null) {
+            val defaultValue = "+${defaultCountry.phoneCode} ${defaultCountry.flag}"
+            binding.registerFragmentPhonecodeEditText.setText(defaultValue, false)
+            binding.registerFragmentPhonecodeEditText.tag = "+${defaultCountry}.phoneCode"
+        }
     }
 
     private fun validateData(): Boolean {
@@ -47,17 +74,17 @@ class RegisterFragment : Fragment() {
         val lastname = binding.registerFragmentLastnameTextInput.editText?.text?.toString()?.trim()
         val birthdate =
             binding.registerFragmentBirthdateTextInput.editText?.text?.toString()?.trim()
-        val phoneCode =
+        val selectedPhoneCode =
             binding.registerFragmentPhonecodeTextInput.editText?.text?.toString()?.trim()
+        val phoneCode = countries.find { country ->
+            selectedPhoneCode?.contains("+${country.phoneCode} ${country.flag}") == true
+        }?.phoneCode
         val phoneNumber = binding.registerFragmentPhoneTextInput.editText?.text?.toString()?.trim()
         val password = binding.registerFragmentPasswordTextInput.editText?.text?.toString()?.trim()
         val confirmPassword =
             binding.registerFragmentConfirmPasswordTextInput.editText?.text?.toString()?.trim()
 
-        if (email.isNullOrEmpty() || name.isNullOrEmpty() || lastname.isNullOrEmpty() ||
-            birthdate.isNullOrEmpty() || phoneCode.isNullOrEmpty() || phoneNumber.isNullOrEmpty() ||
-            password.isNullOrEmpty() || confirmPassword.isNullOrEmpty()
-        ) {
+        if (email.isNullOrEmpty() || name.isNullOrEmpty() || lastname.isNullOrEmpty() || birthdate.isNullOrEmpty() || phoneCode.isNullOrEmpty() || phoneNumber.isNullOrEmpty() || password.isNullOrEmpty() || confirmPassword.isNullOrEmpty()) {
             showToast("Por favor completa todos los campos", requireContext())
             return false
         }
@@ -99,10 +126,8 @@ class RegisterFragment : Fragment() {
         val today = calendar.timeInMillis
 
         val datePicker = MaterialDatePicker.Builder.datePicker()
-            .setTitleText("Selecciona tu fecha de nacimiento")
-            .setSelection(today)
-            .setInputMode(MaterialDatePicker.INPUT_MODE_CALENDAR)
-            .build()
+            .setTitleText("Selecciona tu fecha de nacimiento").setSelection(today)
+            .setInputMode(MaterialDatePicker.INPUT_MODE_CALENDAR).build()
 
         datePicker.addOnPositiveButtonClickListener { selectedDate ->
             val selectedCalendar = Calendar.getInstance()
@@ -121,6 +146,11 @@ class RegisterFragment : Fragment() {
 
     private fun setListeners() {
         binding.apply {
+            registerFragmentPhonecodeEditText.setOnItemClickListener { adapterView, _, position, _ ->
+                registerFragmentPhonecodeTextInput.isErrorEnabled = false
+                val selected = adapterView.getItemAtPosition(position).toString()
+                registerFragmentPhonecodeEditText.setText(selected, false)
+            }
             registerFragmentBirthdateTextInput.setEndIconOnClickListener {
                 showDatePicker()
             }
@@ -133,15 +163,28 @@ class RegisterFragment : Fragment() {
             }
 
             registerFragmentRegisterButton.setOnClickListener {
-                if (!validateData())
-                    return@setOnClickListener
+                if (!validateData()) return@setOnClickListener
+                val selectedPhoneCode =
+                    binding.registerFragmentPhonecodeTextInput.editText!!.text.toString().trim()
+
+                println(
+                    "PHONECODE: +${
+                        countries.find { country ->
+                            selectedPhoneCode.contains("+${country.phoneCode} ${country.flag}")
+                        }!!.phoneCode
+                    }"
+                )
 
                 registerViewModel.register(
                     binding.registerFragmentEmailTextInput.editText!!.text.toString().trim(),
                     binding.registerFragmentNameTextInput.editText!!.text.toString().trim(),
                     binding.registerFragmentLastnameTextInput.editText!!.text.toString().trim(),
                     binding.registerFragmentBirthdateTextInput.editText!!.text.toString().trim(),
-                    binding.registerFragmentPhonecodeTextInput.editText!!.text.toString().trim(),
+                    "+${
+                        countries.find { country ->
+                            selectedPhoneCode.contains("+${country.phoneCode} ${country.flag}")
+                        }!!.phoneCode
+                    }",
                     binding.registerFragmentPhoneTextInput.editText!!.text.toString().trim(),
                     binding.registerFragmentPasswordTextInput.editText!!.text.toString().trim(),
                 )

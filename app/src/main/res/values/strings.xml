@@ -42,4 +42,5 @@
     <string name="set_password_label">Ingresa tu nueva contraseña para poder acceder nuevamente a la aplicación.</string>
     <string name="save_label">Guardar</string>
     <string name="info_icon">ícono de información</string>
+    <string name="username">%1$s %2$s</string>
 </resources>

@@ -9,7 +9,7 @@ import com.eguerra.ciudadanodigital.helpers.Converters
 
 @Database(
     entities = [UserModel::class],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 

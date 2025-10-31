@@ -134,7 +134,7 @@ class UserRepositoryImp @Inject constructor(
                             lastnames = lastname,
                             phoneCode = phoneCode,
                             phoneNumber = phoneNumber,
-                            birthdate = birthdate
+                            birthdate = castDateToISO(birthdate)
                         )
                     )
 

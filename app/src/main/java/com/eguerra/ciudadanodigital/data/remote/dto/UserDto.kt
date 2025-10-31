@@ -1,6 +1,9 @@
 package com.eguerra.ciudadanodigital.data.remote.dto
 
 import com.eguerra.ciudadanodigital.data.local.entity.UserModel
+import org.threeten.bp.LocalDateTime
+import org.threeten.bp.ZoneOffset
+import org.threeten.bp.format.DateTimeFormatter
 
 
 data class UserDto(
@@ -10,7 +13,8 @@ data class UserDto(
     val lastnames: String,
     val birthdate: String,
     val phonecode: String,
-    val phonenumber: String
+    val phonenumber: String,
+    val role: String,
 )
 
 fun UserDto.toUserModel(): UserModel {
@@ -19,8 +23,12 @@ fun UserDto.toUserModel(): UserModel {
         email = this.email,
         names = this.names,
         lastnames = this.lastnames,
-        birthdate = this.birthdate,
+        birthdate = LocalDateTime.parse(
+            this.birthdate,
+            DateTimeFormatter.ISO_DATE_TIME
+        ).atOffset(ZoneOffset.UTC).toLocalDateTime(),
         phoneCode = this.phonecode,
-        phoneNumber = this.phonenumber
+        phoneNumber = this.phonenumber,
+        role = this.role,
     )
 }

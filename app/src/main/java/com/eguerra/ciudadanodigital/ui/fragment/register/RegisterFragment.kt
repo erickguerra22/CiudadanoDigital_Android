@@ -96,7 +96,7 @@ class RegisterFragment : Fragment() {
             binding.registerFragmentEmailTextInput.error = null
         }
 
-        if (!phoneNumber.matches(Regex("^[0-9]{8}$"))) {
+        if (!phoneNumber.matches(Regex("^[0-9]+$"))) {
             binding.registerFragmentPhoneTextInput.error = "Número de teléfono inválido"
             return false
         } else {
@@ -133,7 +133,7 @@ class RegisterFragment : Fragment() {
             val selectedCalendar = Calendar.getInstance()
             selectedCalendar.timeInMillis = selectedDate
 
-            val day = selectedCalendar.get(Calendar.DAY_OF_MONTH)
+            val day = selectedCalendar.get(Calendar.DAY_OF_MONTH) + 1
             val month = selectedCalendar.get(Calendar.MONTH) + 1
             val year = selectedCalendar.get(Calendar.YEAR)
 

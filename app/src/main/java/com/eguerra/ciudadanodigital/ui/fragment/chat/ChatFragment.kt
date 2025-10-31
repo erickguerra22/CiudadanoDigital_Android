@@ -71,9 +71,8 @@ class ChatFragment : Fragment(), MessageListAdapter.MessageListener {
                     if (chatId != null) {
                         if (localChatId == null || localChatId != chatId) {
                             localChatId = chatId
-                            messageViewModel.getMessages(chatId, 50, null)
+                            mainChatViewModel.getMessages(chatId, 50, null, false)
                         }
-                        mainChatViewModel.getMessages(chatId, 20, null, false)
                     } else {
                         localChatId = chatId
                         hideMessagesRecycler()
@@ -183,7 +182,7 @@ class ChatFragment : Fragment(), MessageListAdapter.MessageListener {
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
-            messageViewModel.getChatMessagesStateFlow.collectLatest { result ->
+            mainChatViewModel.getChatMessagesStateFlow.collectLatest { result ->
                 when (result) {
                     is Status.Loading -> {
                         binding.chatFragmentMessageEditText.setText("")

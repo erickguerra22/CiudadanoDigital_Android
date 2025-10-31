@@ -62,7 +62,8 @@
             app:layout_constraintHorizontal_chainStyle="packed"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:shapeAppearanceOverlay="@style/CircleButtonShape" />
+            app:shapeAppearanceOverlay="@style/CircleButtonShape"
+            tools:text="S" />
 
         <TextView
             android:id="@+id/mainActivity_profileName"
@@ -106,6 +107,31 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/mainActivity_previousChatsLabel" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/mainActivity_manageFilesButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="30dp"
+            android:layout_marginBottom="5dp"
+            android:backgroundTint="#21304D"
+            android:elevation="8dp"
+            android:fontFamily="@font/urbanist"
+            android:paddingHorizontal="20dp"
+            android:paddingVertical="10dp"
+            android:text="@string/manage_documents_label"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:visibility="gone"
+            app:cornerRadius="@dimen/input_radius"
+            app:icon="@drawable/manage_files"
+            app:iconSize="20dp"
+            app:iconTint="#979797"
+            app:layout_constraintBottom_toTopOf="@id/mainActivity_newChatButton"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/mainActivity_newChatButton"

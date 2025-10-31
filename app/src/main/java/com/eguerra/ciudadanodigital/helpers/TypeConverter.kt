@@ -3,9 +3,23 @@ package com.eguerra.ciudadanodigital.helpers
 import androidx.room.TypeConverter
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import org.threeten.bp.LocalDateTime
+import org.threeten.bp.format.DateTimeFormatter
 
 class Converters {
     private val gson = Gson()
+
+    private val formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME
+
+    @TypeConverter
+    fun fromString(value: String?): LocalDateTime? {
+        return value?.let { LocalDateTime.parse(it, formatter) }
+    }
+
+    @TypeConverter
+    fun localDateTimeToString(date: LocalDateTime?): String? {
+        return date?.format(formatter)
+    }
 
     @TypeConverter
     fun fromListOfLists(list: List<List<String>>): String {

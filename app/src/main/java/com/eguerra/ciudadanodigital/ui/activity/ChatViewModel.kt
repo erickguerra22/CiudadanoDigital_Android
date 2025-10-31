@@ -44,7 +44,10 @@ class ChatViewModel @Inject constructor(
 
                 else -> {
                     _getUserChatsStateFlow.value =
-                        Status.Error(result.code ?:500,result.message ?: "Ocurrió un error al obtener los mensajes.")
+                        Status.Error(
+                            result.code ?: 500,
+                            result.message ?: "Ocurrió un error al obtener los mensajes."
+                        )
                 }
             }
         }
@@ -69,7 +72,10 @@ class ChatViewModel @Inject constructor(
 
                 else -> {
                     _getChatMessagesStateFlow.value =
-                        Status.Error(result.code ?: 500, result.message ?: "Ocurrió un error al obtener los mensajes.")
+                        Status.Error(
+                            result.code ?: 500,
+                            result.message ?: "Ocurrió un error al obtener los mensajes."
+                        )
                 }
             }
         }

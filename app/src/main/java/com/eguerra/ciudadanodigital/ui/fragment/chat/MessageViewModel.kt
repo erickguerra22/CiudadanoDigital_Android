@@ -64,31 +64,6 @@ class MessageViewModel @Inject constructor(
         }
     }
 
-    private val _getChatMessagesStateFlow: MutableStateFlow<Status<List<MessageModel>>> =
-        MutableStateFlow(Status.Default())
-    val getChatMessagesStateFlow: StateFlow<Status<List<MessageModel>>> = _getChatMessagesStateFlow
-
-    fun getMessages(chatId: String, limit: Int?, offset: Int?, remote: Boolean = false) {
-        _getChatMessagesStateFlow.value = Status.Loading()
-        viewModelScope.launch {
-            when (val result = repository.getChatMessages(
-                chatId = chatId,
-                limit = limit,
-                offset = offset,
-                remote = remote
-            )) {
-                is Resource.Success -> {
-                    _getChatMessagesStateFlow.value = Status.Success(result.data)
-                }
-
-                else -> {
-                    _getChatMessagesStateFlow.value =
-                        Status.Error(result.code ?: 500, result.message ?: "Ocurrió un error al obtener los mensajes.")
-                }
-            }
-        }
-    }
-
     private val _assignMessageStateFlow: MutableStateFlow<Status<Boolean>> =
         MutableStateFlow(Status.Default())
     val assignMessageStateFlow: StateFlow<Status<Boolean>> = _assignMessageStateFlow

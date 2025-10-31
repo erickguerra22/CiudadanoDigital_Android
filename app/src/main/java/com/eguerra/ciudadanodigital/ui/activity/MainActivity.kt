@@ -17,6 +17,7 @@ import com.eguerra.ciudadanodigital.R
 import com.eguerra.ciudadanodigital.data.local.entity.ChatModel
 import com.eguerra.ciudadanodigital.data.local.entity.UserModel
 import com.eguerra.ciudadanodigital.databinding.ActivityMainBinding
+import com.eguerra.ciudadanodigital.helpers.ADMIN
 import com.eguerra.ciudadanodigital.helpers.InternetStatusListener
 import com.eguerra.ciudadanodigital.helpers.InternetStatusManager
 import com.eguerra.ciudadanodigital.helpers.SessionManager
@@ -130,6 +131,11 @@ class MainActivity : AppCompatActivity(), InternetStatusListener, ChatListAdapte
 
                 setOnClickListener {}
             }
+
+            mainActivityProfileButton.setOnClickListener {
+                hideSidePanel()
+                navController.navigate(R.id.profileFragment)
+            }
         }
     }
 
@@ -179,19 +185,10 @@ class MainActivity : AppCompatActivity(), InternetStatusListener, ChatListAdapte
         }
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                mainChatViewModel.selectedChatId.collectLatest { chatId ->
-                    if (chatId != null) {
-                        mainChatViewModel.getMessages(chatId, 20, null, false)
-                    }
-                }
-            }
-        }
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
                 mainUserViewModel.userDataStateFlow.collectLatest { state ->
                     when (state) {
                         is UserSessionStatus.Logged -> {
-                            setUpProfileButton(state.data)
+                            setUpProfileActions(state.data)
                         }
 
                         is UserSessionStatus.NotLogged -> {
@@ -259,7 +256,7 @@ class MainActivity : AppCompatActivity(), InternetStatusListener, ChatListAdapte
         }
     }
 
-    private fun setUpProfileButton(user: UserModel) {
+    private fun setUpProfileActions(user: UserModel) {
         val button = binding.mainActivityProfileButton
         val nameLabel = binding.mainActivityProfileName
         nameLabel.text =
@@ -270,6 +267,9 @@ class MainActivity : AppCompatActivity(), InternetStatusListener, ChatListAdapte
 
         button.text = initial
         button.setBackgroundColor(color)
+
+        if (user.role == ADMIN)
+            binding.mainActivityManageFilesButton.isVisible = true
     }
 
     private fun configureNavigation() {

@@ -12,10 +12,18 @@
         <action
             android:id="@+id/action_chatFragment_to_profileFragment"
             app:destination="@id/profileFragment" />
+        <action
+            android:id="@+id/action_chatFragment_to_documentsFragment"
+            app:destination="@id/documentsFragment" />
     </fragment>
     <fragment
         android:id="@+id/profileFragment"
         android:name="com.eguerra.ciudadanodigital.ui.fragment.profile.ProfileFragment"
         android:label="fragment_profile"
         tools:layout="@layout/fragment_profile" />
+    <fragment
+        android:id="@+id/documentsFragment"
+        android:name="com.eguerra.ciudadanodigital.ui.fragment.documents.DocumentsFragment"
+        android:label="fragment_documents"
+        tools:layout="@layout/fragment_documents" />
 </navigation>

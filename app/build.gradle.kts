@@ -131,4 +131,11 @@ dependencies {
 
     // ThreeTen
     implementation(libs.threetenabp)
+
+    // Glide (previsualización de enlaces para documentos)
+    implementation(libs.glide)
+    ksp(libs.compiler)
+
+    // Swipe Refresh (Recargar)
+    implementation(libs.androidx.swiperefreshlayout)
 }

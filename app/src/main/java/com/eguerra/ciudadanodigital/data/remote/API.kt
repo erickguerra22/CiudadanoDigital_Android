@@ -12,6 +12,7 @@ import com.eguerra.ciudadanodigital.data.remote.dto.requests.RegisterRequest
 import com.eguerra.ciudadanodigital.data.remote.dto.requests.UpdateUserRequest
 import com.eguerra.ciudadanodigital.data.remote.dto.requests.VerifyRecoveryRequest
 import com.eguerra.ciudadanodigital.data.remote.dto.responses.AuthResponse
+import com.eguerra.ciudadanodigital.data.remote.dto.responses.GetDocumentsResponse
 import com.eguerra.ciudadanodigital.data.remote.dto.responses.GetChatMessagesResponse
 import com.eguerra.ciudadanodigital.data.remote.dto.responses.GetChatsResponse
 import com.eguerra.ciudadanodigital.data.remote.dto.responses.NewChatResponse
@@ -19,13 +20,18 @@ import com.eguerra.ciudadanodigital.data.remote.dto.responses.NewMessageResponse
 import com.eguerra.ciudadanodigital.data.remote.dto.responses.NewResponse
 import com.eguerra.ciudadanodigital.data.remote.dto.responses.SimpleMessageResponse
 import com.eguerra.ciudadanodigital.data.remote.dto.responses.VerifyRecoveryResponse
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import retrofit2.Response
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.Headers
+import retrofit2.http.Multipart
 import retrofit2.http.POST
 import retrofit2.http.PUT
+import retrofit2.http.Part
 import retrofit2.http.Path
 import retrofit2.http.Query
 
@@ -152,4 +158,28 @@ interface API {
         @Header("authorization") token: String,
         @Query("question") question: String
     ): Response<NewResponse>
+
+    // DOCUMENT
+    @Multipart
+    @POST("document")
+    suspend fun saveDocument(
+        @Header("authorization") token: String,
+        @Part("filename") filename: RequestBody,
+        @Part("author") author: RequestBody,
+        @Part("year") year: RequestBody,
+        @Part file: MultipartBody.Part
+    ): Response<SimpleMessageResponse>
+
+    @Headers("Content-Type: application/json")
+    @GET("document")
+    suspend fun getDocuments(
+        @Header("authorization") token: String,
+    ): Response<GetDocumentsResponse>
+
+    @Headers("Content-Type: application/json")
+    @DELETE("document/{documentId}")
+    suspend fun deleteDocument(
+        @Header("authorization") token: String,
+        @Path("documentId") documentId: Long,
+    ): Response<SimpleMessageResponse>
 }

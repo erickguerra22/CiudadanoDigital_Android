@@ -101,6 +101,12 @@ class MainActivity : AppCompatActivity(), InternetStatusListener, ChatListAdapte
             mainActivityNewChatButton.setOnClickListener {
                 mainChatViewModel.selectChat(null)
                 hideSidePanel()
+
+                val currentDestination = navController.currentDestination?.id
+
+                if (currentDestination != R.id.chatFragment) {
+                    navController.navigate(R.id.chatFragment)
+                }
             }
 
             mainActivityLogoutButton.setOnClickListener {
@@ -135,6 +141,11 @@ class MainActivity : AppCompatActivity(), InternetStatusListener, ChatListAdapte
             mainActivityProfileButton.setOnClickListener {
                 hideSidePanel()
                 navController.navigate(R.id.profileFragment)
+            }
+
+            mainActivityManageFilesButton.setOnClickListener {
+                hideSidePanel()
+                navController.navigate(R.id.documentsFragment)
             }
         }
     }
@@ -245,7 +256,7 @@ class MainActivity : AppCompatActivity(), InternetStatusListener, ChatListAdapte
     }
 
     override fun onInternetStatusChanged(isConnected: Boolean) {
-        showToast("Estás conectado: $isConnected", this)
+//        showToast("Estás conectado: $isConnected", this)
     }
 
     private fun setupChatsRecycler() {
@@ -268,8 +279,7 @@ class MainActivity : AppCompatActivity(), InternetStatusListener, ChatListAdapte
         button.text = initial
         button.setBackgroundColor(color)
 
-        if (user.role == ADMIN)
-            binding.mainActivityManageFilesButton.isVisible = true
+        if (user.role == ADMIN) binding.mainActivityManageFilesButton.isVisible = true
     }
 
     private fun configureNavigation() {
@@ -280,6 +290,11 @@ class MainActivity : AppCompatActivity(), InternetStatusListener, ChatListAdapte
 
     override fun onItemClicked(chat: ChatModel) {
         hideSidePanel()
+        val currentDestination = navController.currentDestination?.id
+
+        if (currentDestination != R.id.chatFragment) {
+            navController.navigate(R.id.chatFragment)
+        }
         mainChatViewModel.selectChat(chat.chatId.toString())
     }
 }

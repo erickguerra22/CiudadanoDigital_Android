@@ -19,7 +19,6 @@ import com.eguerra.ciudadanodigital.ui.Status
 import com.eguerra.ciudadanodigital.ui.activity.ChatViewModel
 import com.eguerra.ciudadanodigital.ui.activity.LoadingViewModel
 import com.eguerra.ciudadanodigital.ui.activity.MainActivity
-import com.eguerra.ciudadanodigital.ui.activity.UserViewModel
 import com.eguerra.ciudadanodigital.ui.adapters.MessageListAdapter
 import com.eguerra.ciudadanodigital.ui.util.showToast
 import dagger.hilt.android.AndroidEntryPoint
@@ -35,7 +34,6 @@ class ChatFragment : Fragment(), MessageListAdapter.MessageListener {
     private var isMessagesRecyclerUp: Boolean = false
     private var messageAdapter: MessageListAdapter? = null
     private var unassignedMessages: MutableList<MessageModel> = mutableListOf()
-    private val userViewModel: UserViewModel by viewModels()
     private var localChatId: String? = null
 
     override fun onCreateView(
@@ -70,18 +68,24 @@ class ChatFragment : Fragment(), MessageListAdapter.MessageListener {
                 mainChatViewModel.selectedChatId.collectLatest { chatId ->
                     if (chatId != null) {
                         if (localChatId == null || localChatId != chatId) {
+                            if (localChatId != null) {
+                                hideMessagesRecycler()
+                                unassignedMessages = mutableListOf()
+                            }
                             localChatId = chatId
+                            unassignedMessages = mutableListOf()
                             mainChatViewModel.getMessages(chatId, 50, null, false)
                         }
                     } else {
                         localChatId = chatId
-                        hideMessagesRecycler()
+                        if (unassignedMessages.isEmpty())
+                            hideMessagesRecycler()
                     }
                 }
             }
         }
         viewLifecycleOwner.lifecycleScope.launch {
-            messageViewModel.createMessageStateFlow.collectLatest { result ->
+            messageViewModel.createMessageEvent.collect { result ->
                 when (result) {
                     is Status.Loading -> {
                         binding.chatFragmentMessageTextInput.isEnabled = false
@@ -121,7 +125,7 @@ class ChatFragment : Fragment(), MessageListAdapter.MessageListener {
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
-            messageViewModel.getResponseStateFlow.collectLatest { result ->
+            messageViewModel.getResponseEvent.collect { result ->
                 when (result) {
                     is Status.Loading -> {
                         binding.chatFragmentMessageTextInput.isEnabled = false
@@ -169,7 +173,7 @@ class ChatFragment : Fragment(), MessageListAdapter.MessageListener {
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
-            messageViewModel.assignMessageStateFlow.collectLatest { result ->
+            messageViewModel.assignMessageEvent.collect { result ->
                 println("RESULT: $result")
                 when (result) {
                     is Status.Error -> {
@@ -202,7 +206,9 @@ class ChatFragment : Fragment(), MessageListAdapter.MessageListener {
                             layoutManager.stackFromEnd = true
 
                             if (!recycler.canScrollVertically(-1)) {
-                                layoutManager.scrollToPositionWithOffset(messages.size - 1, Int.MIN_VALUE)
+                                layoutManager.scrollToPositionWithOffset(
+                                    messages.size - 1, Int.MIN_VALUE
+                                )
                             }
                         } else {
                             hideMessagesRecycler()

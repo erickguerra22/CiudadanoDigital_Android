@@ -1,6 +1,7 @@
 [versions]
 agp = "8.11.1"
 appcompat = "1.7.1"
+compiler = "5.0.5"
 constraintlayout = "2.2.1"
 converterGson = "3.0.0"
 coreSplashscreen = "1.0.1"
@@ -22,6 +23,7 @@ retrofit = "3.0.0"
 roomCompiler = "2.7.2"
 roomRuntime = "2.7.2"
 roomKtx = "2.7.2"
+swiperefreshlayout = "1.1.0"
 threetenabp = "1.4.9"
 navigationFragment = "2.9.3"
 
@@ -34,7 +36,10 @@ androidx-datastore-preferences = { module = "androidx.datastore:datastore-prefer
 androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "roomKtx" }
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "roomRuntime" }
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomCompiler" }
+androidx-swiperefreshlayout = { module = "androidx.swiperefreshlayout:swiperefreshlayout", version.ref = "swiperefreshlayout" }
+compiler = { module = "com.github.bumptech.glide:compiler", version.ref = "compiler" }
 converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "converterGson" }
+glide = { module = "com.github.bumptech.glide:glide", version.ref = "compiler" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroid" }
 hilt-compiler = { module = "com.google.dagger:hilt-compiler", version.ref = "hiltAndroid" }

@@ -113,6 +113,7 @@ class AuthRepositoryImp @Inject constructor(
             val internetConnection = InternetStatusManager.getLastConnectionState()
 
             if (!internetConnection) {
+                println("NO INTERNET")
                 ds.saveKeyValue("offline", "true")
 
                 return if (token.isNotBlank()) {
@@ -121,6 +122,9 @@ class AuthRepositoryImp @Inject constructor(
                     Resource.Error(500,"No hay conexión a internet y no se encontró token válido almacenado")
                 }
             }
+
+            println("CURRENTTIME: $currentTime")
+            println("EXPIREDATE: $expireDate")
 
             if (currentTime >= expireDate) {
                 if (refreshToken.isBlank()) return Resource.Error(404,"No refreshToken")

@@ -10,6 +10,8 @@ import com.eguerra.ciudadanodigital.data.repository.AuthRepository
 import com.eguerra.ciudadanodigital.data.repository.AuthRepositoryImp
 import com.eguerra.ciudadanodigital.data.repository.ChatRepository
 import com.eguerra.ciudadanodigital.data.repository.ChatRepositoryImp
+import com.eguerra.ciudadanodigital.data.repository.DocumentRepository
+import com.eguerra.ciudadanodigital.data.repository.DocumentRepositoryImp
 import com.eguerra.ciudadanodigital.data.repository.MessageRepository
 import com.eguerra.ciudadanodigital.data.repository.MessageRepositoryImp
 import com.eguerra.ciudadanodigital.data.repository.UserRepository
@@ -195,6 +197,24 @@ class AppModule {
         authRepository: AuthRepository
     ): MessageRepository {
         return MessageRepositoryImp(
+            api = api,
+            context = context,
+            database = database,
+            errorParser = errorParser,
+            authRepository = authRepository
+        )
+    }
+
+    @Provides
+    @Singleton
+    fun provideDocumentRepository(
+        api: API,
+        @ApplicationContext context: Context,
+        database: Database,
+        errorParser: ErrorParser,
+        authRepository: AuthRepository
+    ): DocumentRepository {
+        return DocumentRepositoryImp(
             api = api,
             context = context,
             database = database,

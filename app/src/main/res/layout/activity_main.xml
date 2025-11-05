@@ -103,7 +103,7 @@
             android:paddingTop="8dp"
             android:paddingBottom="8dp"
             android:visibility="visible"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/mainActivity_manageFilesButton"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/mainActivity_previousChatsLabel" />
@@ -150,7 +150,7 @@
             android:textSize="20sp"
             android:textStyle="bold"
             app:cornerRadius="@dimen/input_radius"
-            app:icon="@drawable/new_chat"
+            app:icon="@drawable/add"
             app:iconSize="20dp"
             app:iconTint="#979797"
             app:layout_constraintBottom_toTopOf="@id/mainActivity_logoutButton"

@@ -45,4 +45,14 @@
     <string name="username">%1$s %2$s</string>
     <string name="edit_label">Editar</string>
     <string name="manage_documents_label">Documentos</string>
+    <string name="documents_label">Documentos</string>
+    <string name="add_label">Agregar</string>
+    <string name="file_preview_description">Preview Documento</string>
+    <string name="document_form_title">Nuevo Documento</string>
+    <string name="title_label">Título</string>
+    <string name="document_title_placeholder">Título del documento</string>
+    <string name="author_document_placeholder">Autor</string>
+    <string name="year_document_placeholder">Año de publicación</string>
+    <string name="file_name_placeholder">No se ha seleccionado ningún documento</string>
+    <string name="add_file_label">Cargar</string>
 </resources>

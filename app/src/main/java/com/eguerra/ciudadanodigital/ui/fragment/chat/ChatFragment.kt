@@ -269,12 +269,18 @@ class ChatFragment : Fragment(), MessageListAdapter.MessageListener {
     }
 
     override fun onReferencesRequested(message: MessageModel) {
-        val referencesText = message.reference
+        val referencesText = message.reference?.split(";;;")?.map { r ->
+            "• ${r.trim()}"
+        }
         val tiempoRespuesta =
-            if (message.responseTime != null) "\n\n• Tiempo: ${message.responseTime / 1000}s" else ""
+            if (message.responseTime != null) "\n\nTiempo de respuesta: ${message.responseTime / 1000}s" else ""
 
         AlertDialog.Builder(requireContext()).setTitle("Detalles de la respuesta")
-            .setMessage("Referencias: $referencesText$tiempoRespuesta")
+            .setMessage("Referencias:\n${referencesText?.joinToString("\n")}$tiempoRespuesta")
             .setPositiveButton("Cerrar", null).show()
+    }
+
+    override fun onQuestionSelected(question: String) {
+        messageViewModel.newMessage(content = question, chatId = localChatId)
     }
 }

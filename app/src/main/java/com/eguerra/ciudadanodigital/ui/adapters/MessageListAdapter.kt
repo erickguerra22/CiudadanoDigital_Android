@@ -67,9 +67,11 @@ class MessageListAdapter(
                         text = preguntaLimpia
                         isAllCaps = false
                         letterSpacing = 0f
-                        textAlignment = View.TEXT_ALIGNMENT_TEXT_START
+                        textAlignment = View.TEXT_ALIGNMENT_CENTER
                         typeface = ResourcesCompat.getFont(context, R.font.urbanist)
                         ellipsize = null
+                        strokeWidth = 0
+                        strokeColor = null
                         layoutParams = ViewGroup.MarginLayoutParams(
                             ViewGroup.LayoutParams.MATCH_PARENT,
                             ViewGroup.LayoutParams.WRAP_CONTENT
@@ -87,10 +89,10 @@ class MessageListAdapter(
                         backgroundTintList = ColorStateList.valueOf(
                             ContextCompat.getColor(
                                 holder.itemView.context,
-                                R.color.clear_input_background
+                                R.color.suggested_question_background
                             )
                         )
-                        setTextColor(ContextCompat.getColor(holder.itemView.context, R.color.white))
+                        setTextColor(ContextCompat.getColor(holder.itemView.context, R.color.black))
                         cornerRadius =
                             (16 * holder.itemView.context.resources.displayMetrics.density).toInt()
 

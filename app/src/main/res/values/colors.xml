@@ -13,4 +13,5 @@
     <color name="placeholder">#CAC4D0</color>
     <color name="input_background">#21304D</color>
     <color name="clear_input_background">#293F64</color>
+    <color name="suggested_question_background">#7B9FD3</color>
 </resources>

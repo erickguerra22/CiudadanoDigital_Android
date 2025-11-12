@@ -23,12 +23,12 @@ class DocumentsViewModel @Inject constructor(
     val saveDocumentStateFlow: StateFlow<Status<String>> = _saveDocumentStateFlow
 
     fun saveDocument(
-        filename: String, author: String, year: Int, fileUri: Uri
+        filename: String, author: String, year: Int, fileUri: Uri, minAge: Int, maxAge: Int
     ) {
         _saveDocumentStateFlow.value = Status.Loading()
         viewModelScope.launch {
             when (val result = repository.saveDocument(
-                filename = filename, author = author, year = year, fileUri = fileUri
+                filename = filename, author = author, year = year, fileUri = fileUri, minAge = minAge, maxAge = maxAge
             )) {
                 is Resource.Success -> {
                     _saveDocumentStateFlow.value = Status.Success(result.data)

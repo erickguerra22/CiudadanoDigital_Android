@@ -62,7 +62,7 @@ class DocumentRepositoryImp @Inject constructor(
     }
 
     override suspend fun saveDocument(
-        filename: String, author: String, year: Int, fileUri: Uri
+        filename: String, author: String, year: Int, fileUri: Uri, minAge: Int, maxAge:Int
     ): Resource<String> {
         try {
             when (val activeSession = authRepository.refreshToken()) {
@@ -74,10 +74,12 @@ class DocumentRepositoryImp @Inject constructor(
                     val token = activeSession.data
 
                     val filenameBody =
-                        RequestBody.create("text/plain".toMediaTypeOrNull(), filename)
-                    val authorBody = RequestBody.create("text/plain".toMediaTypeOrNull(), author)
+                        filename.toRequestBody("text/plain".toMediaTypeOrNull())
+                    val authorBody = author.toRequestBody("text/plain".toMediaTypeOrNull())
                     val yearBody =
-                        RequestBody.create("text/plain".toMediaTypeOrNull(), year.toString())
+                        year.toString().toRequestBody("text/plain".toMediaTypeOrNull())
+                    val minAgeBody = minAge.toString().toRequestBody("text/plain".toMediaTypeOrNull())
+                    val maxAgeBody = maxAge.toString().toRequestBody("text/plain".toMediaTypeOrNull())
 
                     val contentResolver = context.contentResolver
                     val mimeType = contentResolver.getType(fileUri)
@@ -102,6 +104,8 @@ class DocumentRepositoryImp @Inject constructor(
                         author = authorBody,
                         year = yearBody,
                         file = filePart,
+                        minAge = minAgeBody,
+                        maxAge = maxAgeBody,
                     )
 
                     return if (result.isSuccessful) {

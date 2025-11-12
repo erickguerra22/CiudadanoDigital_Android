@@ -55,4 +55,7 @@
     <string name="year_document_placeholder">Año de publicación</string>
     <string name="file_name_placeholder">No se ha seleccionado ningún documento</string>
     <string name="add_file_label">Cargar</string>
+    <string name="document_ages_label">Edades contempladas</string>
+    <string name="age_slider_placeholder">13 - 17 años</string>
+    <string name="ages_preview_template">%1$d - %2$d años</string>
 </resources>

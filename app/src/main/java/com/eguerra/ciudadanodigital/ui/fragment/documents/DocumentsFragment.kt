@@ -215,16 +215,26 @@ class DocumentsFragment : Fragment(), DocumentListAdapter.DocumentListener {
                 selectFileLauncher.launch(intent)
             }
             formNewDocumentSaveDocument.setOnClickListener {
-                    val title = formNewDocumentTitleEditText.text.toString()
-                    val author = formNewDocumentAuthorEditText.text.toString()
-                    val year = formNewDocumentYearEditText.text.toString()
+                val title = formNewDocumentTitleEditText.text.toString()
+                val author = formNewDocumentAuthorEditText.text.toString()
+                val year = formNewDocumentYearEditText.text.toString()
 
-                    if (title.isBlank() || author.isBlank() || year.isBlank() || selectedFileUri == null) {
-                        showToast("Por favor completa todos los campos", requireContext())
-                        return@setOnClickListener
-                    }
+                val minAge = formNewDocumentAgeSlider.values[0].toInt()
+                val maxAge = formNewDocumentAgeSlider.values[1].toInt()
 
-                    documentViewModel.saveDocument(title, author, year.toInt(), selectedFileUri!!)
+                if (title.isBlank() || author.isBlank() || year.isBlank() || selectedFileUri == null) {
+                    showToast("Por favor completa todos los campos", requireContext())
+                    return@setOnClickListener
+                }
+
+                documentViewModel.saveDocument(title, author, year.toInt(), selectedFileUri!!, minAge, maxAge)
+            }
+            formNewDocumentAgeSlider.addOnChangeListener { slider, _,_->
+                formNewDocumentAgeSliderPreview.text = getString(
+                    R.string.ages_preview_template,
+                    slider.values[0].toInt(),
+                    slider.values[1].toInt()
+                )
             }
         }
     }

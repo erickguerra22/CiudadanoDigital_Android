@@ -167,6 +167,8 @@ interface API {
         @Part("filename") filename: RequestBody,
         @Part("author") author: RequestBody,
         @Part("year") year: RequestBody,
+        @Part("minAge") minAge: RequestBody,
+        @Part("maxAge") maxAge: RequestBody,
         @Part file: MultipartBody.Part
     ): Response<SimpleMessageResponse>
 
